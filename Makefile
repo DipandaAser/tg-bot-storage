@@ -15,12 +15,8 @@ vet:
 	go vet ./...
 
 check-lint:
-ifeq (, $(shell which golangci-lint))
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.23.8
-endif
-ifeq (, $(shell which errcheck))
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
 	go install github.com/kisielk/errcheck@latest
-endif
 
 ## lint: run linters over the entire code base
 .PHONY: lint
