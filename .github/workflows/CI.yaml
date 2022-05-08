@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  GO_VERSION: 1.16
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Run Tests
+        run: |
+          export BOT_TOKEN=${{ secrets.CI_BOT_TOKEN }}
+          export CHAT_ID=${{ secrets.CI_CHAT_ID }}
+          make test
