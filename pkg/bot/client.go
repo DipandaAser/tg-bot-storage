@@ -90,6 +90,7 @@ func (c *Client) DownloadFileReader(identifier storage.MessageIdentifier, copyCh
 		}
 
 		err = fmt.Errorf("code: %v, message, %s", res.ErrorCode, res.Description)
+		return nil, err
 	}
 
 	return response.Body, nil
