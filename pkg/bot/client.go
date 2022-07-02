@@ -111,3 +111,7 @@ func (c *Client) DownloadFileBuffer(identifier storage.MessageIdentifier, copyCh
 
 	return buf.Bytes(), nil
 }
+
+func (c *Client) GetToken() string {
+	return c.botToken
+}

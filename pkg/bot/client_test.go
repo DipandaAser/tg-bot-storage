@@ -4,15 +4,18 @@ import (
 	"bytes"
 	"github.com/joho/godotenv"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 )
 
 const (
-	ENVBOTTOKEN = "BOT_TOKEN"
-	ENVCHATID   = "CHAT_ID"
+	ENVBOTTOKEN    = "BOT_TOKEN"
+	ENVCHATID      = "CHAT_ID"
+	ENVDRAFTCHATID = "DRAFT_CHAT_ID"
 )
 
 func init() {
@@ -71,7 +74,8 @@ func Test_DownloadFileReader(t *testing.T) {
 			return
 		}
 
-		data, err := client.DownloadFileReader(msgIdentifier, chatId)
+		draftChatId, _ := strconv.ParseInt(os.Getenv(ENVDRAFTCHATID), 10, 64)
+		data, err := client.DownloadFileReader(msgIdentifier, draftChatId)
 		if err != nil {
 			t.Error(err)
 			return
@@ -87,5 +91,38 @@ func Test_DownloadFileReader(t *testing.T) {
 			t.Errorf("Expected %s, got %s", fileContent, string(contentDownloaded))
 			return
 		}
+	})
+
+	t.Run("Stress Multiple Download", func(t *testing.T) {
+		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
+		fileContent := "data"
+		msgIdentifier, err := client.UploadFileReader(chatId, t.Name(), strings.NewReader(fileContent))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		wg := sync.WaitGroup{}
+		draftChatId, _ := strconv.ParseInt(os.Getenv(ENVDRAFTCHATID), 10, 64)
+		lock := sync.Mutex{}
+		count := 0
+		total := 100
+		for i := 0; i < total; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+
+				_, err := client.DownloadFileReader(msgIdentifier, draftChatId)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				lock.Lock()
+				count++
+				log.Printf("Downloaded %d/%d files", count, total)
+				lock.Unlock()
+			}()
+		}
+		wg.Wait()
 	})
 }
