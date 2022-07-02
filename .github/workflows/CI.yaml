@@ -20,5 +20,7 @@ jobs:
       - name: Run Tests
         run: |
           export BOT_TOKEN=${{ secrets.CI_BOT_TOKEN }}
+          export BOT_TOKENS=${{ secrets.CI_BOT_TOKENS }}
+          export DRAFT_CHAT_ID=${{ secrets.CI_DRAFT_CHAT_ID }}
           export CHAT_ID=${{ secrets.CI_CHAT_ID }}
           make test
