@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/DipandaAser/tg-bot-storage/pkg/storage"
+	v1 "github.com/DipandaAser/tg-bot-storage/pkg/models/v1"
 	tb "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"io"
 	"net/http"
@@ -34,7 +34,7 @@ func NewClient(botToken string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) UploadFileReader(chatId int64, fileName string, fileReader io.Reader) (storage.MessageIdentifier, error) {
+func (c *Client) UploadFileReader(chatId int64, fileName string, fileReader io.Reader) (v1.MessageIdentifier, error) {
 
 	tbFile := tb.FileReader{
 		Name:   fileName,
@@ -43,21 +43,22 @@ func (c *Client) UploadFileReader(chatId int64, fileName string, fileReader io.R
 
 	sentMsg, err := c.b.Send(tb.NewDocument(chatId, tbFile))
 	if err != nil {
-		return storage.MessageIdentifier{}, err
+		return v1.MessageIdentifier{}, err
 	}
 
-	return storage.MessageIdentifier{
-		ChatId:    chatId,
-		MessageId: sentMsg.MessageID,
+	return v1.MessageIdentifier{
+		ChatId:       chatId,
+		MessageId:    sentMsg.MessageID,
+		FileUniqueId: sentMsg.Document.FileUniqueID,
 	}, nil
 }
 
-func (c *Client) UploadFileBuffer(chatId int64, fileName string, fileData []byte) (storage.MessageIdentifier, error) {
+func (c *Client) UploadFileBuffer(chatId int64, fileName string, fileData []byte) (v1.MessageIdentifier, error) {
 	reader := bytes.NewReader(fileData)
 	return c.UploadFileReader(chatId, fileName, reader)
 }
 
-func (c *Client) DownloadFileReader(identifier storage.MessageIdentifier, copyChat int64) (io.ReadCloser, error) {
+func (c *Client) DownloadFileReader(identifier v1.MessageIdentifier, copyChat int64) (*v1.DownloadReaderResult, error) {
 	copiedMessage, err := c.b.Send(tb.ForwardConfig{
 		BaseChat:   tb.BaseChat{ChatID: copyChat},
 		FromChatID: identifier.ChatId,
@@ -93,23 +94,33 @@ func (c *Client) DownloadFileReader(identifier storage.MessageIdentifier, copyCh
 		return nil, err
 	}
 
-	return response.Body, nil
+	return &v1.DownloadReaderResult{
+		Data: response.Body,
+		FileInfo: v1.FileInfo{
+			Size:        int64(copiedMessage.Document.FileSize),
+			Name:        copiedMessage.Document.FileName,
+			ContentType: copiedMessage.Document.MimeType,
+		},
+	}, nil
 }
 
-func (c *Client) DownloadFileBuffer(identifier storage.MessageIdentifier, copyChat int64) ([]byte, error) {
-	reader, err := c.DownloadFileReader(identifier, copyChat)
+func (c *Client) DownloadFileBuffer(identifier v1.MessageIdentifier, copyChat int64) (*v1.DownloadBufferResult, error) {
+	result, err := c.DownloadFileReader(identifier, copyChat)
 	if err != nil {
 		return nil, err
 	}
 
-	defer reader.Close()
+	defer result.Data.Close()
 
 	buf := new(bytes.Buffer)
-	if _, err := buf.ReadFrom(reader); err != nil {
+	if _, err := buf.ReadFrom(result.Data); err != nil {
 		return nil, err
 	}
 
-	return buf.Bytes(), nil
+	return &v1.DownloadBufferResult{
+		Data:     buf.Bytes(),
+		FileInfo: result.FileInfo,
+	}, nil
 }
 
 func (c *Client) GetToken() string {

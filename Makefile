@@ -1,9 +1,25 @@
+APPNAME=tg-bot-storage
 .DEFAULT_GOAL := help
 
 ## test: run tests on cmd and pkg files.
 .PHONY: test
 test: vet fmt
 	go test ./...
+
+## build: build application binary.
+.PHONY: build
+build:
+	go build -o $(APPNAME)
+
+## docker-build: build the api docker image
+.PHONY: docker-build
+docker-build:
+	docker build -t bukela/bot-storage .
+
+## docker-run: run the api docker container
+.PHONY: docker-run
+docker-run:
+	docker run -p 7000:7000 --env-file .env bukela/bot-storage
 
 ## fmt: format the code
 .PHONY: fmt
