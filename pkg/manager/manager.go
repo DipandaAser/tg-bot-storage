@@ -5,7 +5,7 @@ import (
 	"container/list"
 	"errors"
 	"github.com/DipandaAser/tg-bot-storage/pkg/bot"
-	"github.com/DipandaAser/tg-bot-storage/pkg/storage"
+	v1 "github.com/DipandaAser/tg-bot-storage/pkg/models/v1"
 	"io"
 	"sync"
 	"time"
@@ -101,7 +101,7 @@ func (m *Manager) StartUploaderManager() {
 	}
 }
 
-func (m *Manager) UploadFileReader(chatId int64, fileName string, fileReader io.Reader) (storage.MessageIdentifier, error) {
+func (m *Manager) UploadFileReader(chatId int64, fileName string, fileReader io.Reader) (v1.MessageIdentifier, error) {
 
 	botClient := m.getOneBot()
 
@@ -112,18 +112,18 @@ func (m *Manager) UploadFileReader(chatId int64, fileName string, fileReader io.
 
 	msgIdentifier, err := botClient.UploadFileReader(chatId, fileName, fileReader)
 	if err != nil {
-		return storage.MessageIdentifier{}, err
+		return v1.MessageIdentifier{}, err
 	}
 
 	return msgIdentifier, nil
 }
 
-func (m *Manager) UploadFileBuffer(chatId int64, fileName string, fileData []byte) (storage.MessageIdentifier, error) {
+func (m *Manager) UploadFileBuffer(chatId int64, fileName string, fileData []byte) (v1.MessageIdentifier, error) {
 	reader := bytes.NewReader(fileData)
 	return m.UploadFileReader(chatId, fileName, reader)
 }
 
-func (m *Manager) DownloadFileReader(identifier storage.MessageIdentifier, copyChat int64) (io.ReadCloser, error) {
+func (m *Manager) DownloadFileReader(identifier v1.MessageIdentifier, copyChat int64) (*v1.DownloadReaderResult, error) {
 	var botClient *bot.Client
 	for _, client := range m.bots {
 		botClient = client
@@ -137,20 +137,23 @@ func (m *Manager) DownloadFileReader(identifier storage.MessageIdentifier, copyC
 	return botClient.DownloadFileReader(identifier, copyChat)
 }
 
-func (m *Manager) DownloadFileBuffer(identifier storage.MessageIdentifier, copyChat int64) ([]byte, error) {
-	reader, err := m.DownloadFileReader(identifier, copyChat)
+func (m *Manager) DownloadFileBuffer(identifier v1.MessageIdentifier, copyChat int64) (*v1.DownloadBufferResult, error) {
+	result, err := m.DownloadFileReader(identifier, copyChat)
 	if err != nil {
 		return nil, err
 	}
 
-	defer reader.Close()
+	defer result.Data.Close()
 
 	buf := new(bytes.Buffer)
-	if _, err := buf.ReadFrom(reader); err != nil {
+	if _, err := buf.ReadFrom(result.Data); err != nil {
 		return nil, err
 	}
 
-	return buf.Bytes(), nil
+	return &v1.DownloadBufferResult{
+		Data:     buf.Bytes(),
+		FileInfo: result.FileInfo,
+	}, nil
 }
 
 // getOneBot returns a bot from the free list and removes it from the free list
