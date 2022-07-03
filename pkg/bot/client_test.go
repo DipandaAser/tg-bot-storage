@@ -75,13 +75,13 @@ func Test_DownloadFileReader(t *testing.T) {
 		}
 
 		draftChatId, _ := strconv.ParseInt(os.Getenv(ENVDRAFTCHATID), 10, 64)
-		data, err := client.DownloadFileReader(msgIdentifier, draftChatId)
+		result, err := client.DownloadFileReader(msgIdentifier, draftChatId)
 		if err != nil {
 			t.Error(err)
 			return
 		}
 
-		contentDownloaded, err := ioutil.ReadAll(data)
+		contentDownloaded, err := ioutil.ReadAll(result.Data)
 		if err != nil {
 			t.Error(err)
 			return
