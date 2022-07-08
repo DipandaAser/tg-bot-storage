@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - .github/workflows/*
   pull_request:
-
+    paths-ignore:
+      - .github/workflows/*
 env:
   GO_VERSION: 1.16
 
