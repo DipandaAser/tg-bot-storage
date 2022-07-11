@@ -1,4 +1,4 @@
-# Telegram Bot Storage(in development)
+# Telegram Bot Storage(WIP)
 ![Build Status](https://github.com/dipandaaser/tg-bot-storage/workflows/CI/badge.svg)
 [![License](https://img.shields.io/github/license/dipandaaser/tg-bot-storage)](LICENSE)
 [![Release](https://img.shields.io/github/release/dipandaaser/tg-bot-storage.svg)](https://github.com/dipandaaser/tg-bot-storage/releases/latest)
