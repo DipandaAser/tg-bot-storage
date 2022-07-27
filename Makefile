@@ -4,7 +4,7 @@ APPNAME=tg-bot-storage
 ## test: run tests on cmd and pkg files.
 .PHONY: test
 test: vet fmt
-	go test ./...
+	CI="false" go test ./...
 
 ## build: build application binary.
 .PHONY: build
@@ -19,7 +19,7 @@ run:
 ## e2etest-compose: run end to end tests in the docker-compose.test.yaml. Basically this is the test for the rest-client package
 .PHONY: e2etest-compose
 e2etest-compose:
-	cd ./pkg/rest-client/ && go test -v -count=1 .
+	cd ./pkg/rest-client/ && CI="true" go test -v -count=1 .
 
 ## e2etest: run end to end tests against local api
 .PHONY: e2etest

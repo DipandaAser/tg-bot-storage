@@ -29,5 +29,6 @@ jobs:
             echo DRAFT_CHAT_ID=${{ secrets.CI_DRAFT_CHAT_ID }}
             echo CHAT_ID=${{ secrets.CI_CHAT_ID }}
             ) > .env
+          cp .env .env.test
           make test
           make docker-e2etest
