@@ -22,8 +22,12 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - name: Run Tests
         run: |
-          export BOT_TOKEN=${{ secrets.CI_BOT_TOKEN }}
-          export BOT_TOKENS=${{ secrets.CI_BOT_TOKENS }}
-          export DRAFT_CHAT_ID=${{ secrets.CI_DRAFT_CHAT_ID }}
-          export CHAT_ID=${{ secrets.CI_CHAT_ID }}
+          (
+            echo BOT_TOKEN=${{ secrets.CI_BOT_TOKEN_1 }}
+            echo BOT_TOKENS=${{ secrets.CI_BOT_TOKEN_1 }},${{ secrets.CI_BOT_TOKEN_2 }},${{ secrets.CI_BOT_TOKEN_3 }}
+            echo TOKENS=${{ secrets.CI_BOT_TOKEN_1 }},${{ secrets.CI_BOT_TOKEN_2 }},${{ secrets.CI_BOT_TOKEN_3 }}
+            echo DRAFT_CHAT_ID=${{ secrets.CI_DRAFT_CHAT_ID }}
+            echo CHAT_ID=${{ secrets.CI_CHAT_ID }}
+            ) > .env
           make test
+          make docker-e2etest

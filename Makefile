@@ -11,6 +11,25 @@ test: vet fmt
 build:
 	go build -o $(APPNAME)
 
+## run: run the api
+.PHONY: run
+run:
+	go run ./cmd/main.go
+
+## e2etest-compose: run end to end tests in the docker-compose.test.yaml. Basically this is the test for the rest-client package
+.PHONY: e2etest-compose
+e2etest-compose:
+	cd ./pkg/rest-client/ && go test -v -count=1 .
+
+## e2etest: run end to end tests against local api
+.PHONY: e2etest
+e2etest:
+	cd ./pkg/rest-client/ && api_host="http://localhost:7000/" CI="true" go test -v -count=1 .
+
+## docker-e2etest: run e2etests in a docker compose
+docker-e2etest:
+	docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from e2etests
+
 ## docker-build: build the api docker image
 .PHONY: docker-build
 docker-build:
