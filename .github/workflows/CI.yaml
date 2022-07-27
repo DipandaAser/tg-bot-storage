@@ -31,4 +31,5 @@ jobs:
             ) > .env
           cp .env .env.test
           make test
+          chmod 777 ./scripts/wait-for-it/wait-for-it.sh
           make docker-e2etest
