@@ -38,7 +38,7 @@ func Test_UploadFileReaderWithOneBot(t *testing.T) {
 		lock := sync.Mutex{}
 		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
 		count := 0
-		total := 25
+		total := 5
 		for i := 0; i < total; i++ {
 			wg.Add(1)
 			go func(i int) {
@@ -75,7 +75,7 @@ func Test_UploadFileReaderWithMultipleBot(t *testing.T) {
 		lock := sync.Mutex{}
 		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
 		count := 0
-		total := 60
+		total := 5
 		for i := 0; i < total; i++ {
 			wg.Add(1)
 			go func(i int) {
@@ -126,7 +126,7 @@ func Test_DownloadFileReader(t *testing.T) {
 		wg := sync.WaitGroup{}
 		lock := sync.Mutex{}
 		count := 0
-		total := 60
+		total := 5
 		for i := 0; i < total; i++ {
 			wg.Add(1)
 			go func() {

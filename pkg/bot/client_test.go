@@ -106,7 +106,7 @@ func Test_DownloadFileReader(t *testing.T) {
 		draftChatId, _ := strconv.ParseInt(os.Getenv(ENVDRAFTCHATID), 10, 64)
 		lock := sync.Mutex{}
 		count := 0
-		total := 100
+		total := 5
 		for i := 0; i < total; i++ {
 			wg.Add(1)
 			go func() {
