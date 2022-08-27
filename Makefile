@@ -4,7 +4,7 @@ APPNAME=tg-bot-storage
 ## test: run tests on cmd and pkg files.
 .PHONY: test
 test: vet fmt
-	CI="false" go test ./...
+	CI="false" go test -v -count=1 ./...
 
 ## build: build application binary.
 .PHONY: build
