@@ -8,6 +8,7 @@ on:
       - .github/workflows/CI.yaml
       - .github/workflows/lint.yaml
       - .github/pull_request_template.yml
+      - README.md
 
 env:
   REGISTRY: ghcr.io
