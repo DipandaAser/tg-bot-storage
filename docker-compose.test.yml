@@ -2,29 +2,24 @@ version: '3'
 
 services:
   api:
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - ./.env
-    environment:
-      api_key: "12345"
     ports:
-      - 7000:7000
+      - "7000:7000"
     extra_hosts:
       - host.docker.internal:host-gateway
+    volumes:
+      - "./config-test:/app/config"
 
   e2etests:
     depends_on:
       - api
     image: golang:buster
     command: /app/scripts/wait-for-it/wait-for-it.sh api:7000 -t 300 -- make -C /app e2etest-compose
-    env_file:
-      - ./.env
     environment:
       CI: "true"
       api_host: "http://api:7000/"
-      api_key: "12345"
     volumes:
       - .:/app

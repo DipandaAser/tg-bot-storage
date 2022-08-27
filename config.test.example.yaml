@@ -1,0 +1,9 @@
+tokens:
+  - "bot token 1"
+  - "bot token 2"
+  - "bot token 3"
+api_key: ""
+#chat_id(int) is the ID of the chat to store message, this is use in some test
+chat_id:
+#draft_chat_id(int) is the ID of the chat used as a draft chat when downloading file
+draft_chat_id:

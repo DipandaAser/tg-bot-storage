@@ -23,11 +23,20 @@ jobs:
       - name: Run Tests
         run: |
           (
+          tokens:
+          - "${{ secrets.CI_BOT_TOKEN_1 }}"
+          - "${{ secrets.CI_BOT_TOKEN_2 }}"
+          - "${{ secrets.CI_BOT_TOKEN_3 }}"
+          api_key: ""
+          #chat_id(int) is the ID of the chat to store message, this is use in some test
+          chat_id: ${{ secrets.CI_CHAT_ID }}
+          #draft_chat_id(int) is the ID of the chat used as a draft chat when downloading file
+          draft_chat_id: ${{ secrets.CI_DRAFT_CHAT_ID }}
             echo BOT_TOKEN=${{ secrets.CI_BOT_TOKEN_1 }}
-            echo BOT_TOKENS=${{ secrets.CI_BOT_TOKEN_1 }},${{ secrets.CI_BOT_TOKEN_2 }},${{ secrets.CI_BOT_TOKEN_3 }}
+            echo BOT_TOKENS=,,
             echo TOKENS=${{ secrets.CI_BOT_TOKEN_1 }},${{ secrets.CI_BOT_TOKEN_2 }},${{ secrets.CI_BOT_TOKEN_3 }}
             echo DRAFT_CHAT_ID=${{ secrets.CI_DRAFT_CHAT_ID }}
-            echo CHAT_ID=${{ secrets.CI_CHAT_ID }}
+            echo CHAT_ID=
             ) > .env
           cp .env .env.test
           make test

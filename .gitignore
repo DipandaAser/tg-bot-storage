@@ -1,3 +1,6 @@
 .idea
 .env.test
 *.env
+config.yaml
+config.test.yaml
+config

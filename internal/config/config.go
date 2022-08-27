@@ -1,28 +1,36 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
+	"gopkg.in/yaml.v3"
 	"os"
-	"strings"
+)
+
+const (
+	configFilePath = "./config/config.yaml"
 )
 
 var defaultConfig *Config
 
 //Config describes the server configuration
 type Config struct {
-	Tokens []string
-	ApiKey string
+	Tokens []string `yaml:"tokens"`
+	ApiKey string   `yaml:"api_key"`
 }
 
-//GetDefaultConfig returns a config with default values  and env variables
+//GetDefaultConfig returns a config with default values from the yaml configFilePath
 func GetDefaultConfig() Config {
 	if defaultConfig == nil {
-		//load postgres env variables
-		_ = godotenv.Load()
+		defaultConfig = &Config{Tokens: make([]string, 0)}
+		// read the config file
+		file, err := os.Open(configFilePath)
+		if err != nil {
+			return Config{}
+		}
+		defer file.Close()
 
-		defaultConfig = &Config{
-			Tokens: strings.Split(os.Getenv("TOKENS"), ","),
-			ApiKey: os.Getenv("API_KEY"),
+		err = yaml.NewDecoder(file).Decode(defaultConfig)
+		if err != nil {
+			return Config{}
 		}
 	}
 	return *defaultConfig
