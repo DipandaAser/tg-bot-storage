@@ -1,2 +1,6 @@
 .env.test
 *.env
+config.yaml
+config
+/config.example.yaml
+/config.test.example.yaml

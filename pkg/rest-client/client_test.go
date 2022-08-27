@@ -2,23 +2,22 @@ package rest_client
 
 import (
 	"bytes"
+	config_test "github.com/DipandaAser/tg-bot-storage/config-test"
 	"github.com/stretchr/testify/assert"
 	"os"
-	"strconv"
 	"strings"
 	"testing"
 )
 
 func init() {
-	if n, err := strconv.ParseInt(os.Getenv("CHAT_ID"), 10, 64); err == nil {
-		chatId = n
-	}
-	if n, err := strconv.ParseInt(os.Getenv("DRAFT_CHAT_ID"), 10, 64); err == nil {
-		draftChatId = n
-	}
+	chatId = config_test.GetConfig(configFilePath).ChatID
+	draftChatId = config_test.GetConfig(configFilePath).DraftChatID
 }
 
-const skipMsg = "Skipping testing in non CI environment"
+const (
+	skipMsg        = "Skipping testing in non CI environment"
+	configFilePath = "../../config-test/config.yaml"
+)
 
 var (
 	apiHost     = os.Getenv("api_host")

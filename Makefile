@@ -4,7 +4,7 @@ APPNAME=tg-bot-storage
 ## test: run tests on cmd and pkg files.
 .PHONY: test
 test: vet fmt
-	CI="false" go test ./...
+	CI="false" go test -v -count=1 ./...
 
 ## build: build application binary.
 .PHONY: build
@@ -28,7 +28,7 @@ e2etest:
 
 ## docker-e2etest: run e2etests in a docker compose
 docker-e2etest:
-	docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from e2etests
+	docker-compose -f docker-compose.test.yml up --force-recreate --abort-on-container-exit --exit-code-from e2etests
 
 ## docker-build: build the api docker image
 .PHONY: docker-build

@@ -14,17 +14,23 @@ COPY . .
 RUN go build -o bin/tg-bot-storage ./cmd/main.go
 
 
-RUN apk add --no-cache ca-certificates
+#RUN apk add --no-cache ca-certificates
 
 # build image with the binary
-FROM scratch
+FROM alpine
 
+RUN apk add --no-cache ca-certificates
+RUN apk add bash
 # copy certificate to be able to make https request to telegram
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+#COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+WORKDIR /app
 
 # copy the binary
-COPY --from=build /build/bin/tg-bot-storage /
+COPY --from=build /build/bin/tg-bot-storage /app/
+
+VOLUME /app/config
 
 EXPOSE 7000
 
-ENTRYPOINT ["/tg-bot-storage"]
+ENTRYPOINT ["/app/tg-bot-storage"]

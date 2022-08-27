@@ -2,35 +2,27 @@ package bot
 
 import (
 	"bytes"
-	"github.com/joho/godotenv"
+	config_test "github.com/DipandaAser/tg-bot-storage/config-test"
 	"io/ioutil"
 	"log"
-	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"testing"
 )
 
 const (
-	ENVBOTTOKEN    = "BOT_TOKEN"
-	ENVCHATID      = "CHAT_ID"
-	ENVDRAFTCHATID = "DRAFT_CHAT_ID"
+	configFilePath = "../../config-test/config.yaml"
 )
 
-func init() {
-	_ = godotenv.Load("../../.env.test")
-}
-
 func Test_UploadFileReader(t *testing.T) {
-	client, err := NewClient(os.Getenv(ENVBOTTOKEN))
+	client, err := NewClient(config_test.GetConfig(configFilePath).Tokens[0])
 	if err != nil {
 		t.Fatal(err)
 		return
 	}
 
 	t.Run("Upload one file", func(t *testing.T) {
-		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
+		chatId := config_test.GetConfig(configFilePath).ChatID
 		data := bytes.NewReader([]byte("data"))
 		_, err = client.UploadFileReader(chatId, t.Name(), data)
 		if err != nil {
@@ -41,14 +33,14 @@ func Test_UploadFileReader(t *testing.T) {
 }
 
 func Test_UploadFileBuffer(t *testing.T) {
-	client, err := NewClient(os.Getenv(ENVBOTTOKEN))
+	client, err := NewClient(config_test.GetConfig(configFilePath).Tokens[0])
 	if err != nil {
 		t.Fatal(err)
 		return
 	}
 
 	t.Run("Send one file", func(t *testing.T) {
-		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
+		chatId := config_test.GetConfig(configFilePath).ChatID
 		data := []byte("data")
 		_, err := client.UploadFileBuffer(chatId, t.Name(), data)
 		if err != nil {
@@ -59,14 +51,14 @@ func Test_UploadFileBuffer(t *testing.T) {
 }
 
 func Test_DownloadFileReader(t *testing.T) {
-	client, err := NewClient(os.Getenv(ENVBOTTOKEN))
+	client, err := NewClient(config_test.GetConfig(configFilePath).Tokens[0])
 	if err != nil {
 		t.Fatal(err)
 		return
 	}
 
 	t.Run("Download one file", func(t *testing.T) {
-		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
+		chatId := config_test.GetConfig(configFilePath).ChatID
 		fileContent := "data"
 		msgIdentifier, err := client.UploadFileReader(chatId, t.Name(), strings.NewReader(fileContent))
 		if err != nil {
@@ -74,7 +66,7 @@ func Test_DownloadFileReader(t *testing.T) {
 			return
 		}
 
-		draftChatId, _ := strconv.ParseInt(os.Getenv(ENVDRAFTCHATID), 10, 64)
+		draftChatId := config_test.GetConfig(configFilePath).DraftChatID
 		result, err := client.DownloadFileReader(msgIdentifier, draftChatId)
 		if err != nil {
 			t.Error(err)
@@ -94,7 +86,7 @@ func Test_DownloadFileReader(t *testing.T) {
 	})
 
 	t.Run("Stress Multiple Download", func(t *testing.T) {
-		chatId, _ := strconv.ParseInt(os.Getenv(ENVCHATID), 10, 64)
+		chatId := config_test.GetConfig(configFilePath).ChatID
 		fileContent := "data"
 		msgIdentifier, err := client.UploadFileReader(chatId, t.Name(), strings.NewReader(fileContent))
 		if err != nil {
@@ -103,7 +95,7 @@ func Test_DownloadFileReader(t *testing.T) {
 		}
 
 		wg := sync.WaitGroup{}
-		draftChatId, _ := strconv.ParseInt(os.Getenv(ENVDRAFTCHATID), 10, 64)
+		draftChatId := config_test.GetConfig(configFilePath).DraftChatID
 		lock := sync.Mutex{}
 		count := 0
 		total := 5
