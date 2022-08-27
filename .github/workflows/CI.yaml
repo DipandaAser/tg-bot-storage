@@ -23,15 +23,13 @@ jobs:
       - name: Run Tests
         run: |
           mkdir config
-          echo (
-          tokens:
-            - "${{ secrets.CI_BOT_TOKEN_1 }}"
-            - "${{ secrets.CI_BOT_TOKEN_2 }}"
-            - "${{ secrets.CI_BOT_TOKEN_3 }}"
-          api_key: ""
-          chat_id: ${{ secrets.CI_CHAT_ID }}
-          draft_chat_id: ${{ secrets.CI_DRAFT_CHAT_ID }}
-          ) > ./config-test/config.yaml
+          echo "tokens:" >./config-test/config.yaml
+          echo "  - "${{ secrets.CI_BOT_TOKEN_1 }}"" >> ./config-test/config.yaml
+          echo "  - "${{ secrets.CI_BOT_TOKEN_2 }}"" >> ./config-test/config.yaml
+          echo "  - "${{ secrets.CI_BOT_TOKEN_3 }}"" >> ./config-test/config.yaml
+          echo "api_key: "" " >> ./config-test/config.yaml
+          echo "chat_id: ${{ secrets.CI_CHAT_ID }}" >> ./config-test/config.yaml
+          echo "draft_chat_id: ${{ secrets.CI_DRAFT_CHAT_ID }}" >> ./config-test/config.yaml
           make test
           chmod 777 ./scripts/wait-for-it/wait-for-it.sh
           make docker-e2etest
