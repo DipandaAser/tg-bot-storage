@@ -8,6 +8,7 @@ on:
       - .github/workflows/CI.yaml
       - .github/workflows/lint.yaml
       - .github/pull_request_template.yml
+      - pkg/rest-client
       - README.md
 
 env:

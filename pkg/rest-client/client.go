@@ -39,9 +39,13 @@ func (rc *RestClient) UploadFileReader(chatId int64, fileName string, fileReader
 	params := url.Values{}
 	params.Set("chat_id", fmt.Sprintf("%d", chatId))
 	params.Set("file_name", fileName)
-	params.Set("api-key", rc.apiKey)
 	var finalUrl = fmt.Sprintf("%s/%s?%s", rc.getApiUrl(), "files", params.Encode())
-	response, err := rc.client.Post(finalUrl, "application/octet-stream", fileReader)
+	request, err := http.NewRequest(http.MethodPost, finalUrl, fileReader)
+	if err != nil {
+		return v1.MessageIdentifier{}, err
+	}
+	request.Header.Set("Content-Type", "application/octet-stream")
+	response, err := rc.do(request)
 	if err != nil {
 		return v1.MessageIdentifier{}, err
 	}
@@ -71,9 +75,12 @@ func (rc *RestClient) DownloadFileReader(identifier v1.MessageIdentifier, copyCh
 	params.Set("chat_id", fmt.Sprintf("%d", identifier.ChatId))
 	params.Set("msg_id", fmt.Sprintf("%d", identifier.MessageId))
 	params.Set("draft_chat_id", fmt.Sprintf("%d", copyChat))
-	params.Set("api-key", rc.apiKey)
 	var finalUrl = fmt.Sprintf("%s/%s?%s", rc.getApiUrl(), "files", params.Encode())
-	response, err := rc.client.Get(finalUrl)
+	request, err := http.NewRequest(http.MethodGet, finalUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+	response, err := rc.do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -118,4 +125,9 @@ func (rc *RestClient) DownloadFileBuffer(identifier v1.MessageIdentifier, copyCh
 		Data:     buf.Bytes(),
 		FileInfo: result.FileInfo,
 	}, nil
+}
+
+func (rc *RestClient) do(req *http.Request) (*http.Response, error) {
+	req.Header.Set("api-key", rc.apiKey)
+	return rc.client.Do(req)
 }
